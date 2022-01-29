@@ -30,4 +30,4 @@ markdown常用命令如下：
 ---
 【插入图片】
 
-！(https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fdrupal.org%2Ffiles%2Fproject-images%2Fgithub_commits_logo_0.png&refer=http%3A%2F%2Fdrupal.org&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1646053077&t=feeb2ea5f97465231acfca6bef8936ed)
+！(timg5.jpg)
