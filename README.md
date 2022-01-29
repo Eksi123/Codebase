@@ -76,9 +76,9 @@ markdown常用命令如下：
 ***
 【插入代码块】
 
-`
+```
 for i in range(5)
   print(i)
-`
+```
 
 
