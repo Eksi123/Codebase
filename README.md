@@ -41,3 +41,20 @@ markdown常用命令如下：
 用html语言插入图片，可调整大小
 
 <img src="https://github.com/Eksi123/Codebase/blob/main/timg5.png" width="50%">
+---
+【插入表格】
+
+插入列表
+
+- 第一行
+- 第二行
+- 第三行
+
+插入表格
+
+学号|姓名|成绩
+-|-|-
+01|小明|90
+02|小红|88
+03|小王|85
+
