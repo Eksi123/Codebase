@@ -65,6 +65,13 @@ markdown常用命令如下：
 ***
 【插入超链接】
 
-连接到网站
+链接到网站
 
 <https://github.com/Eksi123/Codebase>
+
+链接到文件
+[](REDEME.md)
+
+
+
+
