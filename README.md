@@ -30,4 +30,4 @@ markdown常用命令如下：
 ---
 【插入图片】
 
-！[](http://img0.iplant.cn/image61/b/1633320.jpg)
+！(http://img0.iplant.cn/image61/b/1633320.jpg)
