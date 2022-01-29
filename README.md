@@ -31,4 +31,4 @@ markdown常用命令如下：
 【插入图片】
 
 ![](/timg5.png)
-<img src="https://github.com/Eksi123/Codebase/blob/main/timg5.png",width="50%">
+<img src="https://github.com/Eksi123/Codebase/blob/main/timg5.png" width="50%">
