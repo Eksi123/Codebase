@@ -1,2 +1,2 @@
 # Codebase
-save and update training codes
+save and update my training codes
