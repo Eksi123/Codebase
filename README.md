@@ -69,7 +69,7 @@ markdown常用命令如下：
 
 <https://github.com/Eksi123/Codebase>
 
-链接到文件
+链接到项目库内文件
 
 [file](/README.md)
 
