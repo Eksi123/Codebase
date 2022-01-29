@@ -30,4 +30,4 @@ markdown常用命令如下：
 ---
 【插入图片】
 
-<img src="/timg5.png",width="50%">
+<img src="timg5.png",width="50%">
