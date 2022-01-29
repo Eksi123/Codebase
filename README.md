@@ -71,8 +71,14 @@ markdown常用命令如下：
 
 链接到文件
 
-[file](/REDEME.md)
+[file](/README.md)
 
+***
+【插入代码块】
 
+`
+for i in range(5)
+  print(i)
+`
 
 
