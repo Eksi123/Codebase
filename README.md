@@ -35,7 +35,7 @@ markdown常用命令如下：
 
 插入项目库内图片
 
-![](/timg5.png)
+![](/README.png)
 
 插入网络图片
 
@@ -43,7 +43,7 @@ markdown常用命令如下：
 
 用html语言插入图片，可调整大小
 
-<img src="https://github.com/Eksi123/Codebase/blob/main/timg5.png" width="50%">
+<img src="https://github.com/Eksi123/Codebase/blob/main/README.png" width="50%">
 
 ***
 【插入表格】
