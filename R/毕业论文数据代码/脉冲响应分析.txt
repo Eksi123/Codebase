@@ -1,0 +1,92 @@
+#脉冲响应分析与图形展示
+#对数收益率脉冲分析
+IRF1_1<-irf(fit1_1, n.head=20)
+sink("database1.csv",append=TRUE)
+IRF1_1$irf
+sink()
+
+IRF1_2<-irf(fit1_2, n.head=20)
+sink("database1.csv",append=TRUE)
+IRF1_2$irf
+sink()
+
+IRF1_3<-irf(fit1_3, n.head=20)
+sink("database1.csv",append=TRUE)
+IRF1_3$irf
+sink()
+
+IRF1_4<-irf(fit1_4, n.head=20)
+sink("database1.csv",append=TRUE)
+IRF1_4$irf
+sink()
+
+IRF1_5<-irf(fit1_5, n.head=20)
+sink("database1.csv",append=TRUE)
+IRF1_5$irf
+sink()
+
+IRF1_6<-irf(fit1_6, n.head=20)
+sink("database1.csv",append=TRUE)
+IRF1_6$irf
+sink()
+
+IRF1_7<-irf(fit1_7, n.head=20)
+sink("database1.csv",append=TRUE)
+IRF1_7$irf
+sink()
+
+IRF1_8<-irf(fit1_8, n.head=20)
+sink("database1.csv",append=TRUE)
+IRF1_8$irf
+sink()
+
+IRF1_9<-irf(fit1_9, n.head=20)
+sink("database1.csv",append=TRUE)
+IRF1_9$irf
+sink()
+
+#周期波动脉冲分析
+IRF2_1<-irf(fit2_1, n.head=20)
+sink("database2.csv",append=TRUE)
+IRF2_1$irf
+sink()
+
+IRF2_2<-irf(fit2_2, n.head=20)
+sink("database2.csv",append=TRUE)
+IRF2_2$irf
+sink()
+
+IRF2_3<-irf(fit2_3, n.head=20)
+sink("database2.csv",append=TRUE)
+IRF2_3$irf
+sink()
+
+IRF2_4<-irf(fit2_4, n.head=20)
+sink("database2.csv",append=TRUE)
+IRF2_4$irf
+sink()
+
+IRF2_5<-irf(fit2_5, n.head=20)
+sink("database2.csv",append=TRUE)
+IRF2_5$irf
+sink()
+
+IRF2_6<-irf(fit2_6, n.head=20)
+sink("database2.csv",append=TRUE)
+IRF2_6$irf
+sink()
+
+IRF2_7<-irf(fit2_7, n.head=20)
+sink("database2.csv",append=TRUE)
+IRF2_7$irf
+sink()
+
+IRF2_8<-irf(fit2_8, n.head=20)
+sink("database2.csv",append=TRUE)
+IRF2_8$irf
+sink()
+
+IRF2_9<-irf(fit2_9, n.head=20)
+sink("database2.csv",append=TRUE)
+IRF2_9$irf
+

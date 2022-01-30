@@ -1,0 +1,43 @@
+#数据平稳性检验
+library(urca)
+
+#房地产开发投资额
+summary(ur.df(y_X1,type="trend",selectlags = "AIC"))
+summary(ur.df(c_X1,type="none",selectlags = "AIC"))
+#银行间同业拆借额
+summary(ur.df(y_X2,type="trend",selectlags = "AIC"))
+summary(ur.df(c_X2,type="none",selectlags = "AIC"))
+#股票成交额
+summary(ur.df(y_X3,type="trend",selectlags = "AIC"))
+summary(ur.df(c_X3,type="none",selectlags = "AIC"))
+#债券发行额
+summary(ur.df(y_X4,type="trend",selectlags = "AIC"))
+summary(ur.df(c_X4,type="none",selectlags = "AIC"))
+
+#农林牧渔业增加值
+summary(ur.df(y_Y1,type="trend",selectlags = "AIC"))
+summary(ur.df(c_Y1,type="none",selectlags = "AIC"))
+#工业增加值
+summary(ur.df(y_Y2,type="trend",selectlags = "AIC"))
+summary(ur.df(c_Y2,type="none",selectlags = "AIC"))
+#建筑业增加值
+summary(ur.df(y_Y3,type="trend",selectlags = "AIC"))
+summary(ur.df(c_Y3,type="none",selectlags = "AIC"))
+#交通运输、仓储和邮政业增加值
+summary(ur.df(y_Y4,type="trend",selectlags = "AIC"))
+summary(ur.df(c_Y4,type="none",selectlags = "AIC"))
+#住宿和餐饮业增加值
+summary(ur.df(y_Y5,type="trend",selectlags = "AIC"))
+summary(ur.df(c_Y5,type="none",selectlags = "AIC"))
+#金融业增加值
+summary(ur.df(y_Y6,type="trend",selectlags = "AIC"))
+summary(ur.df(c_Y6,type="none",selectlags = "AIC"))
+#房地产业增加值
+summary(ur.df(y_Y7,type="trend",selectlags = "AIC"))
+summary(ur.df(c_Y7,type="none",selectlags = "AIC"))
+#批发和零售业增加值
+summary(ur.df(y_Y8,type="trend",selectlags = "AIC"))
+summary(ur.df(c_Y8,type="none",selectlags = "AIC"))
+#其他行业增加值
+summary(ur.df(y_Y9,type="trend",selectlags = "AIC"))
+summary(ur.df(c_Y9,type="none",selectlags = "AIC"))
