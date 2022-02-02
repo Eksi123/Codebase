@@ -111,6 +111,7 @@ A.insert(2,7)        # 在第三个节点的位置插入新节点（数据为7�
 A.pop(1)             # 删除第二个节点
 
 0 7 2 3 4
+
 A.printf()           # 遍历并输出链表各节点数据
 print(A.len())       # 输出链表长度
 
@@ -120,12 +121,97 @@ print(A.found(6))    # 判断链表内是否含有某节点数据为6
 
 False
 
-# （3）散列结构：如字典（散列表）
+# （3）散列结构：如散列表/哈希表，又说字典，其存储原理简单模拟如下,实际运用时无需定义：
+class HashTable:
+    def __init__(self,size):
+        self.size=size # 自定义散列表/哈希表长度，真实的哈希表长度可动态调整
+        self.keys=[None]*self.size # 存放键key
+        self.values=[None]*self.size # 存放值value
+    
+    def printf(self):
+        length=len(self.keys)
+        for i in range(length):
+            if self.keys[i]!=None:
+                print(self.keys[i]+":"+str(self.values[i]))
+
+    def Hash_Function(self,key): # 散列函数/哈希函数
+        sum=0; length=len(key)
+        for i in range(length): # 求取字符串各字符Unicode值之和
+            sum=sum+ord(key[i])
+        hash=sum%self.size # 散列函数-取余函数，返回哈希值
+        return hash
+
+    def Rehash(self,hash):
+        new_hash=(hash+1)%self.size # 重新求哈希值
+        return new_hash
+
+    def set(self,key,value): # 可实现添加，修改，删除键值对的功能
+        hash=self.Hash_Function(key)
+        if self.keys[hash]==None: # 如果哈希值对应键为空，则添加该键值对
+            self.keys[hash]=key
+            self.values[hash]=value
+        else:
+            if self.keys[hash]==key: # 如果哈希值对应键不为空，且和输入键相同，则修改该键对应的值
+                if value==None:
+                    self.keys[hash]=None # 上述情况下，如果输入值为空，则删除该键值对
+                else:
+                    self.values[hash]=value
+            else:  # 哈希值对应键不为空，但与输入键不同，此时重新求哈希值，直到满足上述两种情况任一种
+                new_hash=self.Rehash(hash)
+                while self.keys[new_hash]!=None and self.keys[new_hash]!=key:
+                    new_hash=self.Rehash(new_hash)
+                
+                if self.keys[new_hash]==None: # 重复上述操作
+                    self.keys[new_hash]=key
+                    self.values[new_hash]=value
+                else:
+                    if self.keys[new_hash]==key: 
+                        if value==None:
+                            self.keys[new_hash]=None 
+                        else:
+                            self.values[new_hash]=value
+
+    def get(self,key): # 输入键，索引值
+        hash=self.Hash_Function(key)
+        if self.keys[hash]==None: # 如果该键不存在，返回空值
+            return None
+        else:
+            if self.keys[hash]==key:
+                return self.values[hash]
+            else:
+                new_hash=self.Rehash(hash) # 操作类似get函数，不断刷新哈希值来检索
+                while self.keys[new_hash]!=key :
+                    new_hash=self.Rehash(new_hash)
+                if new_hash!=hash:
+                    return self.values[new_hash]
+                else:
+                    return None
+
+A=HashTable(5)
+A.set("a",2); A.set("b",4); A.set("c",8)
+A.printf()
+a:2
+b:4
+c:8
+
+A.set("a",1)
+A.printf()
+a:1
+b:4
+c:8
+
+A.set("c",None)
+A.printf()
+a:1
+b:4
+
+A.get("a")
+1
 
 
 #----------------------------------------------------#
 
-# 逻辑结构
+# 逻辑结构（可由上述物理结构组成）
 
 # （1）无序集合，如字典
 A={"a":1,"b":2,"c":3}
