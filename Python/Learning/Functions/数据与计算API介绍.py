@@ -113,6 +113,7 @@ B=np.dot(A2,A3) # 矩阵相乘
 B=A2.T # 矩阵转置
 
 A4=np.array([[1, 2], [3, 4]]) # 2x2方阵
+det=np.linalg.det(A4) # 矩阵求行列式
 B=np.linalg.inv(A4) # 矩阵求逆
 
 # (4)广播运算
@@ -162,9 +163,9 @@ A2[1,2] # 取第二行，第三列的元素，即6
 
 A2[A2>2 & A2<5] # 从数组中选出大于2，小于5的元素值，组成一个一维列表[3,4]
 
-#-------------------------------------------#
+#-------------------------------------------------------#
 
-# scipy：主要用于科学计算，包括积分，微分方程，矩阵运算，拟合与插值等等，下面是最基本的运用
+# scipy：主要用于科学计算，包括积分，方程组求解，概率统计，拟合与插值等等，下面是最基本的运用
 
 # 积分
 from scipy.integrate import quad,dblquad # 其中quad为一重积分函数，ablquad为二重积分函数
@@ -184,35 +185,110 @@ value,error=dblquad(f2,-1,1,(lambda x:-f1(x)),(lambda x: f1(x)))
 与上面不同的是，(lambda x:-f1(x))和(lambda x: f1(x))为二重积分第二个参数y的下限和上限
 """
 
-# 线性代数
+# 线性方程组求解（可用numpy模块中的函数，也可用scipy模块中的函数求解）
+import numpy as np
+A=np.random.rand(3,3)
+B=np.random.rand(3,1)
+X1=np.linalg.solve(A,B) # 方法一：直接求解，得到解向量
+X2=np.dot(np.linalg.inv(A),B) # 方法二：求A^(-1)*B，前提条件是A可逆
 
-# 概率统计
+from scipy import linalg
+AA=linalg.lu_factor(A)
+X3=linalg.lu_solve(AA,B) # 方法三：先对矩阵A作LU分解，然后传递给lu_solve并求解（推荐）
 
-# 拟合与优化
+"""
+det=linalg.det(A) 方阵求行列式值
+A_inv=linalg.inv(A) 满秩矩阵求逆
+e_values,e_vector=linalg.eig(A) 矩阵求特征值与特征向量
 
-# 插值（与拟合不同，需要插值曲线/曲面经过每一个已知点）
+注意，上述求解只当系数矩阵的秩等于增广矩阵的秩时，并且系数矩阵为满秩矩阵时，求解才可能；下面我们介绍更常用
+最小二乘求解法，此时无论系数矩阵的秩小于未知数的个数（无穷解），还是大于未知数的个数，都可以求解
+"""
+import numpy as np
+from scipy import linalg
+A1=np.random.rand(3,4); B1=np.random.rand(3,1)
+A2=np.random.rand(3,2); B2=np.random.rand(3,1)
+X11=np.linalg.lstsq(A1,B1)[0] # 方法一：使用numpy的linalg模块中的lstsq函数求解
+X12=np.linalg.lstsq(A2,A2)[0]
+X12=linalg.lstsq(A1,B1)[0] # 方法二：使用scipy的linalg模块中的lstsq函数求解（推荐）
+X22=linalg.lstsq(A2,B2)[0]
+
+# 非线性方程组求解
+from math import sin
+from scipy import optimize
+
+def f(X): 
+  return [
+    5*X[1]+3,
+    4*X[0]*X[0]-2*sin(X[1]*X[2]),
+    X[1]*X[2]-1.5
+  ]
+"""
+定义非线性方程组，如下：
+5*x1+3=0
+4*x0^2-2*sin(x1*x2)=0
+x1*x2-1.5=0
+"""
+X=optimize.fsolve(f,[1,1,1]) # [1,1,1]为给定的初始解，经过不断迭代求解后得出近似解X
+X=optimize.root(f,[1,1,1]) # 非线性求解的第二种方法
+
+# 线性拟合：本质上和最小二乘法求解未知数相同，求出参数来得到线性拟合/回归函数
+import numpy as np
+from matplotlib import pyplot
+from scipy import optimize
+
+X=np.array([1, 1.5, 2.5, 3, 5, 5.5, 7.5, 8, 9, 9.5]) # 定义解释变量X和响应变量Y
+Y=np.array([2.3, 3.5, 3, 4.5, 7, 6, 9, 13, 15, 16.5])
+
+def residual(Par): # 定义残差函数，其中Par[0]为斜率k，Par[1]为截距b
+  return Y-(Par[0]*X)-Par[1]
+
+Par=optimize.leastsq(residual,[1,0])[0]  # 求解斜率和截距，得到拟合函数
+
+Y1=Par[0]*X+Par[1] # 得到拟合值y1
+
+pyplot.scatter(X,Y,color="blue")
+pyplot.plot(X,Y1,color="red")
+pyplot.show()
+
+
+# 插值（与拟合不同，需要插值曲线/曲面经过每一个已知点，且可非线性）
 import numpy as np
 from matplotlib import pyplot
 from scipy.interpolate import interp1d  # 一维插值模块interp1d，类似的还有二位插值函数interp2d等等
 
-X=np.linspace(0,1,30);  Y=np.sin(5*X)+np.cos(10*X) # 用已有的(x,y)来构建插值函数
+X=np.linspace(0,1,30) # 用已有的(x,y)来构建插值函数 
+Y=np.sin(5*X)+np.cos(10*X) 
 
 fun=interp1d(X,Y, kind="zero") # 零次插值函数
 fun=interp1d(X,Y, kind="linear") # 一次插值函数
 fun=interp1d(X,Y, kind="quadratic") # 二次插值函数
-fun=interp1d(X,Y, kind="cubic") #三次插值函数
-X1=np.linspace(0,1,100);  Y1=fun(X1) # 由插值函数fun来求x1的函数值
+fun=interp1d(X,Y, kind="cubic") # 三次插值函数
+X1=np.linspace(0,1,100);  Y1=fun(X1) # 由插值函数fun来求x1的所有函数值Y1
 pyplot.plot(X1,Y1)
 pyplot.show()
 
+# 概率统计方法：以正态分布为例,loc为模型的位置参数，此处指正态分布均值；scale为尺度参数，此处指正态分布标准差
+import numpy as np
+from scipy import stats
+from matplotlib import pyplot
+
+stats.norm.pdf(0,loc=0,scale=1) # x=0时的概率密度值
+stats.norm.cdf(0,loc=0,scale=1) # x=0时的累积概率值
+stats.norm.ppf(0.5,loc=0,scale=1) # 概率p=0.5时的分位数
+stats.binom.pmf(5,n=10,p=0.6) # x=5时的二项分布B(10,0.6)的概率值
+
+X=stats.norm.rvs(loc=0,scale=1,size=10000) # 获取正态分布N(0,1)的10000个样本
+np.mean(X); np.median(X); np.var(X); np.std(X); stats.skew(X); stats.kurtosis(X) # 均值，方差等统计指标
+pyplot.hist(X) # 查看直方图，观察可知所取样本来自于正态分布N(mean=1, variance=4)
+pyplot.show() 
+
+Y=stats.binom.rvs(n=10,p=0.6,size=10000) # 获取二项分布B(10,0.6)的10000个样本
+pyplot.hist(Y)
+pyplot.show()
 
 
-
-
-
-
-
-#-------------------------------------------------#
+#----------------------------------------------------------#
 
 # pandas：主要用于对数据表（变量/特征 与 样本/观测 所组成的数据表）的运用，下面是最基本的运用
 import pandas as pd
