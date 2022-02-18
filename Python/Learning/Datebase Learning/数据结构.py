@@ -244,3 +244,221 @@ A.pop(0) #出列（先进后出）
 print(A) 
 
 # （3）非线性表，如树，图
+#  (3.1)树，以二叉树为例模拟树的构建和遍历：
+"""
+一颗树由节点和边组成，边是节点之间的联系，是一种虚指；节点包括根节点（只有出边），普通节点和叶子节点（只有入边）。
+
+根据节点之间上下级联系，又可以分为父节点和子节点，父节点的出边指向子节点，，一个父节点和其子节点，以及节点间的边构成一颗子树
+当然父节点，子节点和子树都是相对的。
+
+最后，某一节点的层数等同于从根节点到该节点的边数，所有叶子节点的最大层数即为该树的高度。
+
+二叉树是最常见也最常用的树结构，根据其外观可分为：【1】满二叉树（每个叶子节点均位于最深层，且其父节点一定有左，右两个子节点）
+【2】完全二叉树：除最深层外，其余层所构成的二叉树为满二叉树，最深层叶子节点从左往右依次排列，可以不满）。其余如非满二叉树
+，非完全二叉树同理，下面我们来构建一般意义上的二叉树，并对其实现遍历
+"""
+class BinaryTree:
+    def __init__(self,rootnode): 
+        self.rootnode=rootnode # 树的根节点/父节点
+        self.left_tree=None # 左子树
+        self.right_tree=None # 右子树
+    
+    def find(self,data): # 查找某一结点值是否存在
+        if self.rootnode==data:
+            return True
+        else:
+            if self.left_tree:
+                return self.left_tree.find(data)
+            if self.right_tree:
+                return self.right_tree.find(data)
+
+    def add_left_tree(self,newnode): # 添加左子树
+        self.left_tree=BinaryTree(newnode)
+        return self.left_tree
+        
+    def add_right_tree(self,newnode): # 添加右子树
+        self.right_tree=BinaryTree(newnode)
+        return self.right_tree
+
+    def del_tree(self): # 删除所在节点的整棵树
+        self.rootnode=None
+        self.left_tree=None
+        self.right_tree=None
+        return self.rootnode, self.left_tree, self.right_tree
+
+    def set_rootnode(self,newnode): # 不添加新子树，仅修改父节点值
+        self.rootnode=newnode
+        return self.rootnode
+
+Tree=BinaryTree(4) # 通过定义根节点来定义一棵二叉树
+node1=Tree.add_left_tree(3) # 树的节点，但相对来看也是一颗子树
+node2=node1.add_left_tree(1)
+node3=node1.add_right_tree(2)
+node4=Tree.add_right_tree(5)
+"""
+二叉树构造如下：
+                       4
+                      / \
+                     3   5
+                    / \
+                   1   2
+"""
+
+def breadth_travel(tree): # 广度优先遍历，也叫层次遍历，从根节点开始，逐层从左往右遍历
+    if tree:
+        List=[tree] 
+        while List:
+            cur_tree=List.pop(0) # 创建一个队列，左进左出
+            print(cur_tree.rootnode, end=" ")
+            if cur_tree.left_tree:
+                List.append(cur_tree.left_tree)
+            if cur_tree.right_tree:
+                List.append(cur_tree.right_tree)
+
+def pre_order_travel(tree): # 深度优先遍历之一：先序遍历，从根节点开始，先递归地遍历左子树，再遍历右子树
+    if tree.rootnode:
+        print(tree.rootnode, end=" ")
+        if tree.left_tree:
+            pre_order_travel(tree.left_tree)
+        if tree.right_tree:
+            pre_order_travel(tree.right_tree)
+
+def mid_order_travel(tree): # 深度优先遍历之二：中序遍历，先递归地遍历左子树，再访问根节点，最后递归地遍历右子树
+    if tree.rootnode:
+        if tree.left_tree:
+            mid_order_travel(tree.left_tree)
+        print(tree.rootnode, end=" ")
+        if tree.right_tree:
+            mid_order_travel(tree.right_tree)
+
+def post_order_travel(tree): # 深度优先遍历之三：后序遍历，先递归地遍历左子树，再遍历右子树，最后访问根节点
+    if tree.rootnode:
+        if tree.left_tree:
+            post_order_travel(tree.left_tree)
+        if tree.right_tree:
+            post_order_travel(tree.right_tree)
+        print(tree.rootnode, end=" ")
+
+breadth_travel(Tree)
+pre_order_travel(Tree)
+mid_order_travel(Tree)
+post_order_travel(Tree)
+
+"""
+遍历结果如下:
+广度优先遍历：4 3 5 2 1 
+先序遍历：4 3 2 1 5 
+中序遍历：2 1 3 4 5 
+后序遍历：2 1 3 5 4 
+"""
+    
+# (3.2) 图
+"""
+图是一种比树更复杂的数据结构，但其形象的表示方法使其可用于模拟日常生活中的许许多多图形结构，如网络，路径，迷宫等等，进而借助
+计算机的强大能力来解决十分困难的实际问题。
+
+与树一样，图同样由节点/顶点和边组成，不同在于节点之间是平等的，不存在”父子关系“以及根节点，叶子节点等等，此外图的边不再是虚指，
+它不仅可用于表达两个节点间的联系，还可以表示指向（有向图和无向图）以及节点联系的权重（无权图/等权图，带权图/非等权图）。
+最后，边与节点可以组成环这一几何结构，进而将图分为有环图和无环图。
+
+对于树这一数据结构，我们的侧重点在于用其来补充列表的不足；而对于图来说，我们将完全聚焦于其强大的图形和路径表达能力上。
+下面我们来构建一般意义上的图，并对其实现遍历
+"""
+import numpy as np
+class Graph:  # 出于简洁，本例只用邻接矩阵表示法来表示图
+    def __init__(self,n):
+        self.List_vertex=[] # 用于存放顶点
+        self.num_vertex=n # 顶点个数
+        self.matrix=np.full((n ,n),0) # 初始化邻接矩阵
+
+    def add_vertex(self,new_vertex): # 载入顶点
+        self.List_vertex.append(new_vertex)
+        return self.List_vertex
+
+    def add_edge(self,index1,index2): # 载入边（输入两个顶点在列表中的索引号）
+        if index1==index2:
+            print("error!")
+        else:
+            self.matrix[index1][index2]=1
+            self.matrix[index2][index1]=1
+            return self.matrix
+    
+    def show_matrix(self): # 展示整个邻接矩阵
+        for index in range(self.num_vertex):
+            print(self.List_vertex[index]+":", end="")
+            print(self.matrix[index])
+
+    def neighbor(self,vertex): # 由某一顶点得到其邻接顶点的索引号
+        List=[]; index=None
+        for i in range(self.num_vertex):
+            if self.List_vertex[i]==vertex:
+                index=i
+                break
+        for j in range(self.num_vertex):
+            if self.matrix[index][j]==1:
+                List.append(j)
+        return List
+
+    def bfs(self,start_index): # 广度优先遍历：与二叉树的遍历类似，不同之处在于需要考虑循环遍历的情况
+        Visited=[start_index] # start_index为指定的遍历起点
+        List=[self.List_vertex[start_index]]
+        while List:
+            cur_vertex=List.pop(0) # 队列，先进先出，实现同一层顶点的优先遍历
+            print(cur_vertex, end=" ")
+            for index in self.neighbor(cur_vertex):
+                if index not in Visited:
+                    Visited.append(index)
+                    List.append(self.List_vertex[index])
+
+    def dfs(self,start_index): # 深度优先遍历：同样与二叉树的深度优先遍历类似，不过不指定前后序，实现方法与上面几乎一致
+        Visited=[start_index]
+        List=[self.List_vertex[start_index]]
+        while List:
+            cur_vertex=List.pop() # 栈，先进后出，实现同一条纵深路径的优先遍历
+            print(cur_vertex, end=" ")
+            for index in self.neighbor(cur_vertex):
+                if index not in Visited:
+                    Visited.append(index)
+                    List.append(self.List_vertex[index])
+    
+
+List=["A","B","C","D","E","F"] 
+graph=Graph(len(List)) # 生成图，此时没有顶点没有边，需载入
+for i in range(len(List)): # 载入顶点
+    graph.add_vertex(List[i]) 
+graph.add_edge(1,2) # 载入边
+graph.add_edge(2,4)
+graph.add_edge(3,4)
+graph.add_edge(1,0)
+graph.add_edge(2,0)
+graph.add_edge(2,5)
+graph.add_edge(4,5)
+
+graph.show_matrix() # 展示邻接矩阵
+
+graph.dfs(5)
+graph.bfs(5)
+"""
+邻接矩阵如下:
+A:[0 1 1 0 0 0]
+B:[1 0 1 0 0 0]
+C:[1 1 0 0 1 1]
+D:[0 0 0 0 1 0]
+E:[0 0 1 1 0 1]
+F:[0 0 1 0 1 0]
+
+实际情况中图 如下：
+       A -- B    D
+        \  /    /
+          C -- E
+           \  /
+             F
+
+遍历结果如下：
+深度优先遍历：F E D C B A
+广度优先遍历：F C E A B D
+"""
+    
+
+        
+

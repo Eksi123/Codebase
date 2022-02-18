@@ -87,6 +87,26 @@ f(max,Goods_Value)
 
 
 #----------------------------------#
+# 分治算法
+
+# 二分查找问题
+A2=[1,2,3,5,5,8,9,12,23,43,45,64]; item=13
+
+def find_21(List,item): # 非递归
+    flag=False; first=0; last=len(List)-1
+    while first<=last and flag==False:
+        mid=(first+last)//2  # 模运算
+        if List[mid]==item:
+            flag=True
+        else:
+            if List[mid]<item:
+                first=first+1
+            else:
+                last=last-1
+    return flag
+print(find_21(A2,item))
+
+#----------------------------------#
 # 回溯算法
 
 # 马的遍历问题：nxm的棋盘，选定棋盘上一点(x,y)并按照“马”的规则走，规划出该点不重复地走过棋盘上任一位置的路线？
