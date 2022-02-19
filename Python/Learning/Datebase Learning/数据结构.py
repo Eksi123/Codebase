@@ -128,7 +128,7 @@ class HashTable:
         self.keys=[None]*self.size # 存放键key
         self.values=[None]*self.size # 存放值value
     
-    def printf(self):
+    def printf(self): # 打印散列表/哈希表
         length=len(self.keys)
         for i in range(length):
             if self.keys[i]!=None:
@@ -141,8 +141,8 @@ class HashTable:
         hash=sum%self.size # 散列函数-取余函数，返回哈希值
         return hash
 
-    def Rehash(self,hash):
-        new_hash=(hash+1)%self.size # 重新求哈希值
+    def Rehash(self,hash): # 重新求哈希值
+        new_hash=(hash+1)%self.size 
         return new_hash
 
     def set(self,key,value): # 可实现添加，修改，删除键值对的功能
@@ -359,7 +359,7 @@ post_order_travel(Tree)
 
 与树一样，图同样由节点/顶点和边组成，不同在于节点之间是平等的，不存在”父子关系“以及根节点，叶子节点等等，此外图的边不再是虚指，
 它不仅可用于表达两个节点间的联系，还可以表示指向（有向图和无向图）以及节点联系的权重（无权图/等权图，带权图/非等权图）。
-最后，边与节点可以组成环这一几何结构，进而将图分为有环图和无环图。
+最后，有向图可以组成闭环这一几何结构，进而将图分为有环图和无环图。
 
 对于树这一数据结构，我们的侧重点在于用其来补充列表的不足；而对于图来说，我们将完全聚焦于其强大的图形和路径表达能力上。
 下面我们来构建一般意义上的图，并对其实现遍历
@@ -379,7 +379,7 @@ class Graph:  # 出于简洁，本例只用邻接矩阵表示法来表示图
         if index1==index2:
             print("error!")
         else:
-            self.matrix[index1][index2]=1
+            self.matrix[index1][index2]=1 # 若其中任一元素为0，则说明两顶点之间存在指向
             self.matrix[index2][index1]=1
             return self.matrix
     
@@ -388,38 +388,42 @@ class Graph:  # 出于简洁，本例只用邻接矩阵表示法来表示图
             print(self.List_vertex[index]+":", end="")
             print(self.matrix[index])
 
-    def neighbor(self,vertex): # 由某一顶点得到其邻接顶点的索引号
-        List=[]; index=None
+    def neighbor_vertex(self,vertex): # 由某一顶点得到其邻接顶点
+        List1=[]; List2=[]; index=None
         for i in range(self.num_vertex):
             if self.List_vertex[i]==vertex:
                 index=i
                 break
         for j in range(self.num_vertex):
             if self.matrix[index][j]==1:
-                List.append(j)
-        return List
+                List1.append(j)
+        
+        for index in List1:
+            List2.append(self.List_vertex[index])
 
-    def bfs(self,start_index): # 广度优先遍历：与二叉树的遍历类似，不同之处在于需要考虑循环遍历的情况
-        Visited=[start_index] # start_index为指定的遍历起点
-        List=[self.List_vertex[start_index]]
+        return List2
+
+    def bfs_travel(self,start_vertex): # 广度优先遍历：与二叉树的遍历类似，不同之处在于需要考虑循环遍历的情况
+        Visited=[start_vertex] # start_index为指定的遍历起点
+        List=[start_vertex]
         while List:
             cur_vertex=List.pop(0) # 队列，先进先出，实现同一层顶点的优先遍历
             print(cur_vertex, end=" ")
-            for index in self.neighbor(cur_vertex):
-                if index not in Visited:
-                    Visited.append(index)
-                    List.append(self.List_vertex[index])
+            for vertex in self.neighbor_vertex(cur_vertex):
+                if vertex not in Visited:
+                    Visited.append(vertex)
+                    List.append(vertex)
 
-    def dfs(self,start_index): # 深度优先遍历：同样与二叉树的深度优先遍历类似，不过不指定前后序，实现方法与上面几乎一致
-        Visited=[start_index]
-        List=[self.List_vertex[start_index]]
+    def dfs_travel(self,start_vertex): # 深度优先遍历：同样与二叉树的深度优先遍历类似，不过不指定前后序，实现方法与上面几乎一致
+        Visited=[start_vertex]
+        List=[start_vertex]
         while List:
             cur_vertex=List.pop() # 栈，先进后出，实现同一条纵深路径的优先遍历
             print(cur_vertex, end=" ")
-            for index in self.neighbor(cur_vertex):
-                if index not in Visited:
-                    Visited.append(index)
-                    List.append(self.List_vertex[index])
+            for vertex in self.neighbor_vertex(cur_vertex):
+                if vertex not in Visited:
+                    Visited.append(vertex)
+                    List.append(vertex)
     
 
 List=["A","B","C","D","E","F"] 
@@ -436,8 +440,8 @@ graph.add_edge(4,5)
 
 graph.show_matrix() # 展示邻接矩阵
 
-graph.dfs(5)
-graph.bfs(5)
+graph.dfs_travel("F")
+graph.bfs_travel("F")
 """
 邻接矩阵如下:
 A:[0 1 1 0 0 0]
