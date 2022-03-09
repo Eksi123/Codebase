@@ -97,6 +97,73 @@ Tree.travel()
 遍历结构如下：7 5 4 3 6 8 
 """
 
+# 霍夫曼二叉树（待更新）
+"""
+字符串（包括数字）在计算机的存储和传输过程都是以二进制编码形式存在。在内存中通常采用Unicode编码方式，在磁盘和传输过程中则一般采用UTF-8的编码方式。
+为了减少字符串传输过程中储存消耗，提高传输效率，我们就需要对字符串定义一种新的编码方式，此处我们介绍的是“霍夫曼编码方式”，它能有效降低字符串编码后的数据存储空间，
+并且保证传输后的二进制数据能完全还原原有字符串的信息（简称“无损压缩”）
+
+要实现霍夫曼编码，就需要借助霍夫曼二叉树 -- 一种基于字符出现频率大小的编码手段，简而言之，字符频率越高，编码越短。举例如下
+
+str="abccbadcaa"
+
+[1]共有4个不同字符，一般的，我们可知需要2个bit来表示它们，即 a:00 b:01 c:10 d:11，则编码结果为：00011010010011100000（20个bit)
+[2]采用霍夫曼编码的方式，首先计算各字符出现频率：a:1/3 b:2/9 c:1/3 d:1/9 则由频率大小给字符排序为：a c b d，那么可编码为：a:0 c:11 b:101 d:100
+   则编码结果为：0101111110101001100（19个bit）
+
+貌似结果并不显著，但别忘了，当需要被压缩的字符个数非常多时，其功效是很可观的！
+"""
+#节点类，当树中叶节点最大数为n时，霍夫曼树的总节点数为2n-1
+class Node(object):
+    def __init__(self,name=None,value=None):
+        self._name=name
+        self._value=value
+        self._left=None
+        self._right=None
+        self._codevalue='0'
+
+#哈夫曼树类
+class HuffmanTree(object):
+    #根据Huffman树的思想：以叶子节点为基础，反向建立Huffman树
+    def __init__(self,char_weights):
+        self.codeway = {}#存储节点对应的编码数，1 or 0
+        self.a=[Node(part[0],part[1]) for part in char_weights]  #根据输入的字符及其频数生成叶子节点
+        while len(self.a)!=1:#如果没有到达根节点
+            self.a.sort(key=lambda node:node._value,reverse=True)#根据节点的value进行从大到小的排序
+            c=Node(value=(self.a[-1]._value+self.a[-2]._value))#对于权值最小的两个节点加和作为新节点c的value
+            c._left=self.a.pop(-1)#把排序完的树叶节点挂靠在c上，作为左右节点
+            c._right=self.a.pop(-1)
+            self.a.append(c)#bac作为节点连在树上
+        self.root=self.a[0]
+
+    def Huffman_Code(self, tree, length,l):
+        if l==0:
+            self.b=[0]*length
+        node = tree
+        if (not node):
+            return
+        elif node._name:
+            print(node._name + '的编码为:',end=' ')
+            for i in range(l):
+                print(self.b[i],end=' ')
+            print('\n')
+            return
+
+        #是树的左子节点的话赋值为0，直到到达叶结点之后print了编码，再对考虑右子树
+        self.b[l] = 0
+        self.Huffman_Code(node._left, length,l + 1)
+        self.b[l] = 1
+        self.Huffman_Code(node._right,length,l + 1)
+
+
+#输入字符及其频数
+char_weights=[('a',4),('b',2),('c',3),('d',1)]
+tree=HuffmanTree(char_weights)
+length=len(char_weights)
+
+tree.Huffman_Code(tree.root,length,0)
+
+
 
 # 图的最短路径：只考虑无向图，用列表保存已经访问的顶点
 # 【1】等权图求最短路径

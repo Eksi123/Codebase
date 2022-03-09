@@ -71,3 +71,59 @@ def find_3(List,item):
 find_3(A3,item)
 
 # 时间复杂度O(1)
+
+
+# 扩展：KMP字符串匹配（搜索）算法（待更新）
+"""
+现有字符串： STR="acabaabaabcacaabc"     str="abaabcac" 
+现在我们需要判定字符串str是否在STR中出现，即在STR中搜索str，这就需要用到KMP字符串匹配算法，其思路如下：
+
+通常，我们会采用逐字符比对的方法：即从str的首字符"a"开始，若STR中某一位置的字符也是"a",则继续比对下一个，直到str中所有字符比对完成，我们就说str存在于STR中。反之，若比对过程中哪一个
+对不上，则str需要从头开始比对。
+
+可以看到，这种暴力比对方法虽然简单直观，但问题在于：
+"""
+class Solution:
+    # 获取next数组
+    def get_next(self, T):
+        i = 0
+        j = -1
+        next_val = [-1] * len(T)
+        while i < len(T)-1:
+            if j == -1 or T[i] == T[j]:
+                i += 1
+                j += 1
+                # next_val[i] = j
+                if i < len(T) and T[i] != T[j]:
+                    next_val[i] = j
+                else:
+                    next_val[i] = next_val[j]
+            else:
+                j = next_val[j]
+        return next_val
+
+    # KMP算法
+    def kmp(self, S, T):
+        i = 0
+        j = 0
+        next = self.get_next(T)
+        while i < len(S) and j < len(T):
+            if j == -1 or S[i] == T[j]:
+                i += 1
+                j += 1
+            else:
+                j = next[j]
+        if j == len(T):
+            return i - j
+        else:
+            return -1
+
+
+
+STR = 'acabaabaabcacaabc' # 主字符串
+str = 'abaabcac' # 待匹配字符串
+solution = Solution()
+solution.kmp(STR, str) # 输出匹配后的起始位置
+
+
+9787111652090
