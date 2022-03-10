@@ -58,7 +58,7 @@ A10=np.random.uniform(size=1000) # 均匀分布随机数组（0-1均匀分布）
 A10=np.random.normal(0,1,size=1000) # 正态分布随机数组（均值为0，方差为1）
 A10=np.random.binomial(10,0.6,size=1000) # 二项分布随机数组（n为10，概率为0.6）
 A10=np.random.exponential(0.2,size=1000) # 指数分布随机数（lambda=0.2）
-A10=np.random.possion(5,size=1000) # 泊松分布随机数（lambda=5）
+A10=np.random.poisson(5,size=1000) # 泊松分布随机数（lambda=5）
 """
 类似的，还有np.random.geometric(0.6,size=1000)_几何分布  np.chisquare(10,size=1000)_卡方分布等等
 """
@@ -251,8 +251,21 @@ pyplot.scatter(X,Y,color="blue")
 pyplot.plot(X,Y1,color="red")
 pyplot.show()
 
+# 非线性拟合（平滑）：用于得出非线性拟合曲线/平滑曲线，平滑曲线不要求经过原曲线上的点
+import numpy as np
+from matplotlib import pyplot
+from scipy.signal import savgol_filter # 多项式平滑模块
 
-# 插值（与拟合不同，需要插值曲线/曲面经过每一个已知点，且可非线性）
+X=np.arange(1,31)
+Y=np.log(X)+np.random.uniform(0,0.2,size=30)
+Y11=savgol_filter(Y, window_length=11, polyorder=3, mode="nearest") # 参数分别为窗口长度（奇数，小于数组长度，越大平滑越明显），拟合阶数（越小平滑越明显），模式
+
+pyplot.scatter(X,Y)
+pyplot.plot(X,Y11)
+pyplot.show()
+
+
+# 插值（与拟合不同，插值曲线会经过原曲线的每一点）
 import numpy as np
 from matplotlib import pyplot
 from scipy.interpolate import interp1d  # 一维插值模块interp1d，类似的还有二位插值函数interp2d等等
@@ -264,7 +277,8 @@ fun=interp1d(X,Y, kind="zero") # 零次插值函数
 fun=interp1d(X,Y, kind="linear") # 一次插值函数
 fun=interp1d(X,Y, kind="quadratic") # 二次插值函数
 fun=interp1d(X,Y, kind="cubic") # 三次插值函数
-X1=np.linspace(0,1,100);  Y1=fun(X1) # 由插值函数fun来求x1的所有函数值Y1
+X1=np.linspace(0,1,100);  Y1=fun(X1) # 由插值函数fun来求x1的所有函数值Y1，插值后数量从30变为100个（注意插值函数定义域还是[0,1])
+pyplot.scatter(X,Y)
 pyplot.plot(X1,Y1)
 pyplot.show()
 
@@ -289,12 +303,13 @@ pyplot.show()
 
 
 #----------------------------------------------------------#
+# pandas：主要用于对数据表DataFrame和标签数组Series的运用，下面是最基本的用法介绍
 
-# pandas：主要用于对数据表（变量/特征 与 样本/观测 所组成的数据表）的运用，下面是最基本的运用
+# （1）数据表
+# （1.1）数据表创建/导入与导出
 import pandas as pd
 
-# 数据表创建/导入与导出
-data1=pd.DataFrame(pd.read_csv("1.csv",header=0,encoding="utf8")) # 导入数据表，以csv文件为例
+data1=pd.DataFrame(pd.read_csv("data/1.csv",header=0,encoding="utf8")) # 导入数据表，以csv文件为例
 
 data2=pd.DataFrame(  # 创建数据表
   {"id":["06","07","08","09","10"],
@@ -306,13 +321,15 @@ data2=pd.DataFrame(  # 创建数据表
 
 data1.info() # 查看数据表基本信息，包括维度，变量名称，数据格式
 
-data1.values # 查看全部数据值
+data1.values # 查看全部数据的值，也可以查看某列的的值
+
+data1.loc[1,["age"]].values[0] # 查看“age”列第二行数据的值
 
 print(data1) # 查看数据表
 
-data1["name","age"] # 选择“name"列和"age"列的数据值
+data1["name","age"] # 选择“name"列和"age"列的数据
 
-data1.loc[0:3,["name","age"]] # 选择第1到第4行，“name"列和"age"列的数据值
+data1.loc[0:3,["name","age"]] # 选择第1到第4行，“name"列和"age"列的数据
 """
     name  age
 0   Judy   12
@@ -321,27 +338,27 @@ data1.loc[0:3,["name","age"]] # 选择第1到第4行，“name"列和"age"列的
 3  Linda   14
 """
 
-data11=data1[data1["age"]>12 & data1["age"]<15] # 选择年龄大于12，小于15的所有的样本/观测
+data11=data1[(data1["age"]>12) & (data1["age"]<15)] # 选择年龄大于12，小于15的所有数据（多重选择括号不能省）
 
-data11.to_csv("2.csv",index=False,header=True) # 将数据集写入csv文件中
+data11.to_csv("data/2.csv",index=False,header=True) # 将数据集写入csv文件中
 
-# 数据表预处理
+# （1.2）数据表预处理
 
 data1.rename(columns={"age":"age1"},inplace=True) # 修改列名，age改为age1
 
-data1["age"]=data1["age"].astype("float") # 将age列的数据替换由整型改为浮点型
+data1["age"]=data1["age"].astype("float") # 将age列的数据值由整型改为浮点型
 
 data1["name"]=data1["name"].replace("Tom","Tony") # 将name中Tom改为Tony
 
-data1=data1.sort_values(by=["age"],ascending=True) # 对数据表中age列作升序处理，ascending为False则为降序
+data1.sort_values(by=["age"],ascending=True) # 对数据表中age列数据值作升序处理，ascending为False则为降序
 
-data1=data1.drop(labels="age",axis=1,inplace=True) # 删除age列，axis为0则为删除行
+data1.drop(columns="age",axis=1,inplace=True) # 删除age列，axis为0则为删除行
 
-data1=data1.dropna(axis=0) # 删除带有NaN空值的行，axis=1则为删除列
+data1.dropna(axis=0) # 删除带有NaN空值的行，axis=1则为删除列
 
 data1=data1.fillna(0) # 用指定数值0填充NaN空值
 
-# 数据表操作
+# （1.3）数据表操作
 
 data1=pd.concat([data1,data2],axis=0) 
 """
@@ -388,7 +405,7 @@ data1=pd.melt(data1,id_vars="id",var_name="variable",value_name="value")
 
 """
 
-data2=pd.DataFrame(pd.read_csv("2.csv",header=0,encoding="utf8"))
+data2=pd.DataFrame(pd.read_csv("data/2.csv",header=0,encoding="utf8"))
 data=data2.groupby("year").sum() 
 """
 类似于excel中的分类汇总功能，根据变量year的变量值对value进行求和运算，并自动排除字符串变量id
@@ -419,4 +436,53 @@ B  2010      1
 C  2010      1
    2011      1
 """
+
+# （2）标签数组：功能类似于字典，且可为该数组命名
+# （2.1）标签数组创建/导入
+import pandas as pd
+
+series=pd.Series({ # 创建
+  "a":10,
+  "b":20,
+  "c":25,
+  "d":35
+}, name="my serires")
+
+value=[10,20,25,35]; index=["a","b","c","d"] # 导入
+series=pd.Series(value, index, name="my series")
+"""
+a    10.0
+b    20.0
+c    25.0
+d    35.0
+e     NaN
+Name: my serires, dtype: float64
+"""
+
+series.index # 查看索引号
+series.values # 查看值
+print(series) # 查看整个标签数组
+
+series[0:2] # 获取位序为0到1的数据
+series[["a","b"]] # 获取索引号为"a"和"b"的数据
+series[series.values<=20] # 获取数据值不大于20的数据
+
+#（2.2）标签数组预处理
+import pandas as pd
+
+series=pd.Series({ # 创建
+  "a":10,
+  "b":20,
+  "c":25,
+  "d":35,
+  "e":None
+}, name="my series")
+series/2 # 数组值除以2
+series.sum() # 计算数组总和，同理mean,median,mode,std可用于求均值，中位数，众数和标准差
+series.value_counts() # 汇总数组中每个值的数量
+series.sort_values(ascending=True) # ascending为True表示升序，为False表示降序
+series=series.drop("a") # 删除索引号为"a"的数据
+series=series.fillna(0) # 缺失值填补
+dataframe=pd.DataFrame(series) # Series转为DataFrame
+series=pd.Series(dataframe["my series"].values, index=list(range(dataframe.shape[0])), name="series") # DataFrame转为Series
 
