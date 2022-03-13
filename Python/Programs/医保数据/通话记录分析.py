@@ -14,6 +14,7 @@
 【4】结论及总结
 """
 # 导入模块与读取数据
+from subprocess import call
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -171,24 +172,26 @@ axes2.set_xticks(range(1,600+1,60),labels=[8,9,10,11,12,13,14,15,16,17])
 axes2.set_xlabel("busy / wait")
 axes2.set_ylabel("ratio")
 
-# plt.show()
+plt.show()
 
 # 【第二部分】
-file=open("电话重播情况.csv","w",encoding="utf-8")
-call_number={} # 保存重播电话接收时间，等待与通话时长
+file1=open("data/电话重播情况.csv","w",encoding="utf-8")
+recall={} # 保存重播电话,接收时间，等待与通话时长等信息
 
 length=s_createdTime.shape[0]
 for i in range(length):
     number=int(s_callerIdNumber[i])
+    if number>10000000: # 电话号码长度少于8位数的可能是测试号，不管
+        if number in recall:
+            recall[number].append(str(s_createdTime[i])+"---"+str(s_answeredTime[i])+"---"+str(s_queueWaitTime[i])+"---"+str(s_callDuration[i]))
+        else:
+            recall[number]=[str(s_createdTime[i])+"---"+str(s_answeredTime[i])+"---"+str(s_queueWaitTime[i])+"---"+str(s_callDuration[i])]
 
-    if number in call_number:
-        call_number[number].append(str(s_createdTime[i])+"&"+str(s_answeredTime[i])+"&"+str(s_queueWaitTime[i])+"&"+str(s_callDuration[i]))
-    else:
-        call_number[number]=[str(s_createdTime[i])+"&"+str(s_answeredTime[i])+"&"+str(s_queueWaitTime[i])+"&"+str(s_callDuration[i])]
+recall=sorted(recall.items(), key=lambda x: len(x[1]), reverse=True) # 对字典按值进行排序，输出元组
 
-for key in call_number:
-    if len(call_number[key])>1:
-        file.write(str(key)+":"+"\n")
-        for i in range(len(call_number[key])):
-            file.write(call_number[key][i]+"\n")
-        file.write("----------------------"+"\n")
+for i in range(len(recall)):
+    if len(recall[i][1])>1:
+        file1.write(str(recall[i][0])+":"+"\n")
+        for j in range(len(recall[i][1])):
+            file1.write(recall[i][1][j]+"\n")
+        file1.write("-----"+"\n")
