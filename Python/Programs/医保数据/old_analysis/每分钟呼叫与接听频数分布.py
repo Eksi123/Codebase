@@ -4,26 +4,26 @@ from scipy.signal import savgol_filter
 
 file=open("通话记录.csv","r",encoding="utf-8")
 
-call_minute={}; receive_minute={} #保存每个分钟段呼叫频数和接听平均频数（不含周末和26日数据）
+# call_minute={}; receive_minute={} #保存每个分钟段呼叫频数和接听平均频数（不含周末和26日数据）
 
-line=file.readline()
-while True:
-    line=file.readline()
-    if not line: break
-    line=(line.strip()).split(",")
+# line=file.readline()
+# while True:
+#     line=file.readline()
+#     if not line: break
+#     line=(line.strip()).split(",")
 
-    hour1=line[0][-8:-6]; hour2=line[4][-8:-6]
-    minute1=line[0][-5:-3]; minute2=line[4][-5:-3]
-    if int(line[1]) not in [6,7,13,14,20,21]:  
-        if hour1 in call_minute:
-            call_minute[hour1][minute1]=call_minute[hour1].get(minute1,0)+1 # call_minute[hour1].get(minute1,0)：若call_minute[hour1][minute1]不存在，则赋值为0
-        else:
-            call_minute[hour1]={}
-    if (int(line[1]) not in [6,7,13,14,20,21]) and line[4]:
-        if hour2 in receive_minute:
-            receive_minute[hour2][minute2]=receive_minute[hour2].get(minute2,0)+1
-        else:
-            receive_minute[hour2]={}
+#     hour1=line[0][-8:-6]; hour2=line[4][-8:-6]
+#     minute1=line[0][-5:-3]; minute2=line[4][-5:-3]
+#     if int(line[1]) not in [6,7,13,14,20,21]:  
+#         if hour1 in call_minute:
+#             call_minute[hour1][minute1]=call_minute[hour1].get(minute1,0)+1 # call_minute[hour1].get(minute1,0)：若call_minute[hour1][minute1]不存在，则赋值为0
+#         else:
+#             call_minute[hour1]={}
+#     if (int(line[1]) not in [6,7,13,14,20,21]) and line[4]:
+#         if hour2 in receive_minute:
+#             receive_minute[hour2][minute2]=receive_minute[hour2].get(minute2,0)+1
+#         else:
+#             receive_minute[hour2]={}
 
 """
 【1】经检验用dataframe数据表获取call_minute, receive_minute速度较慢
@@ -48,9 +48,9 @@ for i in range(length):
                 receive_minute[hour_1][minute_1]=receive_minute[hour_1].get(minute_1,0)+1
             else:
                 receive_minute[hour_1]={}
+"""
 
-
-【2】经检验用series标签数组获取call_minute, receive_minute速度有较大幅度提升
+# 【2】经检验用series标签数组获取call_minute, receive_minute速度有较大幅度提升
 Call_Data=pd.DataFrame(pd.read_csv("通话记录.csv",header=0, encoding="utf-8"))
 
 call_minute={}; receive_minute={} # 用于保存对应时段，分钟的呼叫次数和接听次数
@@ -70,20 +70,20 @@ for i in range(length):
         else:
             call_minute[hour_0]={}
         
-        if not s_answeredTime[i]:
+        if pd.isnull(s_answeredTime[i])==False:
             hour_1=s_answeredTime[i][-8:-6];  minute_1=s_answeredTime[i][-5:-3]
-            if hour_1 in call_minute:
+            if hour_1 in receive_minute:
                 receive_minute[hour_1][minute_1]=receive_minute[hour_1].get(minute_1,0)+1
             else:
                 receive_minute[hour_1]={}
-"""
+
 Y1=[]; Y2=[]; Ratio=[]
 for hour in range(8,17+1):
     hour=("0"+str(hour))[-2:]
     for minute in range(0,59+1):
         minute=("0"+str(minute))[-2:]
-        Y1.append(call_minute[hour].get(minute,0))
-        Y2.append(receive_minute[hour].get(minute,0))
+        Y1.append((call_minute[hour].get(minute,0))/20)
+        Y2.append((receive_minute[hour].get(minute,0))/20)
 
 
 Y11=savgol_filter(Y1,59,3,mode="nearest")
