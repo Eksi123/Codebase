@@ -5,7 +5,7 @@
         数据筛选条件为"queueId != 0"
 
 分析目标：平均每天每时每分钟电话接收频数分布，人工等待、通话平均时长分布（剔除周末数据，以及每天正常上班之外的数据）
-         重播电话接收时间，，等待与通话时长
+         重播电话，对应日期及重播次数（不考虑未接通情况）
          
 步骤：
 【1】筛选数据及特征处理
@@ -14,7 +14,6 @@
 【4】结论及总结
 """
 # 导入模块与读取数据
-from subprocess import call
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -120,7 +119,7 @@ for hour in range(8,17+1):
         duration_0=np.append(duration_0, wait_duration[hour].get(minute,0)/20)
         duration_1=np.append(duration_1, busy_duration[hour].get(minute,0)/20)
 
-duration_0=duration_0/times_0 # 求等待平均时长，单位（秒）
+duration_0=duration_0/(times_0+np.full(600,0.001)) # 求等待平均时长，单位（秒）
 duration_1=duration_1/(times_1+np.full(600,0.001)) # 求通话平均时长，单位（秒），为避免零除问题，times_1中各项加上0.001
  
 times_00=savgol_filter(times_0,59,3,mode="nearest") # 对原数据作平滑处理
@@ -175,23 +174,31 @@ axes2.set_ylabel("ratio")
 plt.show()
 
 # 【第二部分】
-file1=open("data/电话重播情况.csv","w",encoding="utf-8")
-recall={} # 保存重播电话,接收时间，等待与通话时长等信息
+file=open("data/重播情况.csv","w",encoding="utf-8")
+recall={} # 保存重播电话,日期和重播次数信息
 
 length=s_createdTime.shape[0]
 for i in range(length):
     number=int(s_callerIdNumber[i])
-    if number>10000000: # 电话号码长度少于8位数的可能是测试号，不管
+    if number>10000000 and pd.isnull(s_answeredTime[i])==False: # 电话号码长度少于8位数的可能是测试号不管，未接通的不管。
+        date=s_answeredTime[i].split("/")[0] # 取日期
         if number in recall:
-            recall[number].append(str(s_createdTime[i])+"---"+str(s_answeredTime[i])+"---"+str(s_queueWaitTime[i])+"---"+str(s_callDuration[i]))
+            recall[number][date]=recall[number].get(date,0)+1 # 根据日期计数
         else:
-            recall[number]=[str(s_createdTime[i])+"---"+str(s_answeredTime[i])+"---"+str(s_queueWaitTime[i])+"---"+str(s_callDuration[i])]
+            recall[number]={date:1}
 
-recall=sorted(recall.items(), key=lambda x: len(x[1]), reverse=True) # 对字典按值进行排序，输出元组
+def fun(x): # 汇总重播次数
+    sum=0
+    for key in x:
+        sum=sum+x[key]
+    return sum
+
+recall=sorted(recall.items(), key=lambda x: fun(x[1]), reverse=True)  # 根据重播次数排序（从大到小）
 
 for i in range(len(recall)):
-    if len(recall[i][1])>1:
-        file1.write(str(recall[i][0])+":"+"\n")
-        for j in range(len(recall[i][1])):
-            file1.write(recall[i][1][j]+"\n")
-        file1.write("-----"+"\n")
+    file.write(str(recall[i][0])+":"+"\t")
+    for key in recall[i][1]:
+        file.write(str(key)+"->"+str(recall[i][1][key])+"s"+"\t")
+    file.write("\n")
+
+file.close()
