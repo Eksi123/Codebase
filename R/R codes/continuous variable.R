@@ -81,7 +81,7 @@ plot(X,F,type="h") #查看概率分布函数图
 
 #用[0,1]上均匀分布的随机数产生其他分布的随机变量值（逆变换法）
 #runif(n,min,max) 产生均匀分布随机数
-#rnorm(n,mu,sd) 产生正态分布随机数
+#rnorm(n,mu,sigma) 产生正态分布随机数
 #rexp(n,lmbda) 产生指数分布随机数
 #rchisq(n,df) 产生卡方分布随机数
 #rf(n,df1,df2) 产生F分布随机数

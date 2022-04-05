@@ -1,0 +1,32 @@
+#用模拟法求几何图形面积
+#求单位圆的面积
+X<-runif(10000,0,1)
+Y<-runif(10000,0,1)
+
+count<-0
+for(i in 1:10000){
+  if(X[i]*X[i]+Y[i]*Y[i]<=1){
+    count=count+1
+  }
+}
+
+S=(count/10000)*4
+S
+
+#求单位正三角形面积
+X<-runif(10000,0,1)
+Y<-runif(10000,0,1)
+
+count<-0
+
+for(i in 1:10000){
+  if(X[i]<=0.5 && Y[i]<=sqrt(3/4)){
+    count<-count+1
+  }
+}
+
+count
+S=(count/10000)
+S
+
+
