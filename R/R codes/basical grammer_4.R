@@ -40,10 +40,7 @@ ggplot(data=df,aes(x=level,y=value))+   # data指数据集，aes指映射关系
   labs(title="graph",x="level",y="value") # labs指各类标签
   
 
-ggplot(data=df,aes(x=level,y=value))+  # color函数用于区分不同type的数据
+ggplot(data=df,aes(x=level,y=value，color=type))+  # color函数用于给不同type的数据分组，单图展示
   geom_point(pch=17,size=2)+  
-  facet_grid(type~.)+
+  facet_grid(type~.)+  # facet_grid函数用于给不同type的数据分面，多图展示
   labs(title="graph",x="level",y="value") 
-
-
-#  
