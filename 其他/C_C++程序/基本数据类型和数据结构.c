@@ -62,7 +62,7 @@ void main(){
     int x1 = 5;
     float x2 = 2.5;
     double x3 = 1.5;
-    char str[4] = "abcd"; // 满足字符个数不大于数组长度
+    char str[4] = 'abcd'; // 满足字符个数不大于数组长度
     // 还可以采用数组的方式定义：char str[4] = {'a','b'.'c',''d} 但一般不用
     char arr[4] = {1,2,3,4}; // 一维数组
     char arr2[2][2] = {{1,2},{3,4}}; // 二维数组，同理可定义多维数组
@@ -87,7 +87,7 @@ void main(){
     // 数字与字符串类型互换，类似还有atof（字符串转浮点数）
     printf("%d",strlen(str));
     // 求字符串长度
-    char str1[10] = "efg";
+    char str1[10] = 'efg';
     strcat(str1,str);
     // 字符串的拼接,str接到str1后面
     char str1[10];
@@ -100,7 +100,7 @@ void main(){
     char* ret = strstr(str,str1);
     printf("%s",ret);
     // 子字符串str1在主字符str串中的匹配，若匹配上，则返回str中对应子串，否则返回(null)
-    char str2[3][5] = {"abc","def","ghi"};
+    char str2[3][5] = {'abc','def','ghi'};
     printf("%s",str[0]); // 输出结果为abc
     // 字符串数组定义与读取
 
@@ -115,7 +115,7 @@ void main(){
     /*指针*/ 
     int *p_x1 = &x1; // 指针变量的定义，含义为把整数变量x1的地址赋给指针变量p1，浮点数类似
     int *p_arr = arr; // 特别的，数组名代表数组首地址，同样可写 int *p_arr = &arr[0]
-    int *p_str = "abcd"; // 更特别的，字符串代表了字符串数组首地址，同样也可以先定义字符串数组，然后操作同上，如int *p_str = str。
+    int *p_str = 'abcd'; // 更特别的，字符串代表了字符串数组首地址，同样也可以先定义字符串数组，然后操作同上，如int *p_str = str。
     printf("%d\t%d\t%d",p_x1,p_arr,p_str);
     // 指针变量输出，结果分别为x1,arr,str的存储地址
     printf("%d\t%d\t%c",*p_x1,*p_arr,*p_str);
