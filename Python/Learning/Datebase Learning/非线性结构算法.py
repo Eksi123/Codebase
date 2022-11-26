@@ -97,7 +97,7 @@ Tree.travel()
 遍历结构如下：7 5 4 3 6 8 
 """
 
-# 霍夫曼二叉树（待更新）
+# 霍夫曼二叉树
 """
 字符串（包括数字）在计算机的存储和传输过程都是以二进制编码形式存在。在内存中通常采用Unicode编码方式，在磁盘和传输过程中则一般采用UTF-8的编码方式。
 为了减少字符串传输过程中储存消耗，提高传输效率，我们就需要对字符串定义一种新的编码方式，此处我们介绍的是“霍夫曼编码方式”，它能有效降低字符串编码后的数据存储空间，
@@ -165,11 +165,11 @@ tree.Huffman_Code(tree.root,length,0)
 
 
 
-# 图的最短路径：只考虑无向图，用列表保存已经访问的顶点
+# 1. 图的最短路径问题：只考虑无向图，用列表保存已经访问的顶点
 # 【1】等权图求最短路径
-from operator import countOf
+# from operator import countOf
 import numpy as np
-class Graph:  # 沿用数据结构中图的邻接矩阵表示法
+class Graph:  # 沿用数据结构中图的邻接表示法
     def __init__(self,n):
         self.List_vertex=[] 
         self.num_vertex=n 
@@ -206,6 +206,8 @@ graph1.add_edge(3,5)
 graph1.add_edge(4,5)
 graph1.add_edge(4,6)
 graph1.add_edge(5,6)
+
+graph1.show_matrix()
 
 """
 图的结构如下：
@@ -477,3 +479,77 @@ path= ['A', 'B', 'E', 'F', 'G']
 极端的，当A,B,C均为双向边时，三个顶点构成一个闭环，那么会发现无论更新C，还是更新B，它们到A都更近了！这就陷入了一个无解的
 死循环！
 """
+
+
+# 2.图的最小生成树问题
+"""
+最小生成树问题旨在找到这样一副子图：包含原图所有节点，且各节点之间都是相互“可达”的，同时要求相连边的总权值（距离）“最小”。不难得知最小生成树（图）总边数 = 总节点数-1
+"""
+
+#Kruskal算法：归并顶点的贪婪算法，适合稠密图
+def Kruskal(graph):
+    vnum=graph.vertex_num()
+    reps=[i for i in range(vnum)]
+    mst,edges=[],[]
+    for vi in range(vnum):
+        for v,w in graph.out_edges(vi):
+            edges.append((w,vi,v))
+    edges.sort()
+    for w,vi,vj in edges:
+        if reps[vi]!=reps[vj]:
+            mst.append(((vi,vj),w))
+            if len(mst)==vnum-1:
+                break
+            rep,orep=reps[vi],reps[vj]
+            for i in range(vnum):
+                if reps[i]==orep:
+                    reps[i]=rep
+    return mst
+
+#prim算法：归并边的贪婪算法，适合稀疏网
+def Prim(graph):
+    vnum=graph.vertex_num()
+    mst=[None]*vnum
+    cands=PrioQue([(0,0,0)])
+    count=0
+    while count<vnum and not cands.is_empty():
+        w,u,v=cands.dequeue()
+        if mst[v]:
+            continue
+        mst[v]=((u,v),w)
+        count+=1
+        for vi,w in graph.out_edges(v):
+            if not mst[vi]:
+                cands.enqueue((w,v,vi))
+    return mst
+
+
+# 3.图的拓扑排序问题
+"""
+简单理解就是将一个有向无环图（有向指单向）排成一个序列，序列顺序满足图的指向关系，这就要求序列中某节点的前驱节点排在它前面，后继节点位于它后面，同一层节点相邻排列。
+"""
+def topological_sort(self):
+        print('topological sort----------------')
+        in_degree_map={}#入度map
+        queue=Queue()
+        result=[]
+        for vertex in self.vertices.values():#构造入度矩阵
+            if len(vertex.inEdges)==0:
+                queue.put(vertex)#入队
+            else:
+                in_degree_map[vertex]=len(vertex.inEdges)
+
+        while not queue.empty():
+            vertex=queue.get()
+            result.append(vertex.value)
+            for edge in vertex.outEdges:
+                in_degree =in_degree_map.get(edge.to)-1
+                in_degree_map[edge.to]=in_degree
+                if in_degree==0:
+                    queue.put(edge.to)
+
+        if len(result)<len(self.vertices):
+            print('图有环，无法进行拓扑排序')
+        else:
+            print('图无环，拓扑排序结果为：')
+            print(result)

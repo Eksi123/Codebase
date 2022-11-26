@@ -118,12 +118,9 @@ class Solution:
         else:
             return -1
 
-
-
 STR = 'acabaabaabcacaabc' # 主字符串
 str = 'abaabcac' # 待匹配字符串
 solution = Solution()
 solution.kmp(STR, str) # 输出匹配后的起始位置
 
 
-9787111652090

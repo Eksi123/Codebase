@@ -77,7 +77,7 @@ class LinkList:
                 pre.next=cur.next
                 cur.next=None    
     
-    def insert_1(node,data):   # 在指点节点node后插入一个新节点
+    def insert_1(node,data):   # 在指定节点node后插入一个新节点
         newnode=Node(data)
         node1=node.next
         node.next=newnode
@@ -102,15 +102,15 @@ A=LinkList()         # 创建链表
 for i in range(5):
     A.append(i)
 
-0 1 2 3 4
+# 0 1 2 3 4
 
 A.insert(2,7)        # 在第三个节点的位置插入新节点（数据为7）
 
-0 1 7 2 3 4
+# 0 1 7 2 3 4
 
 A.pop(1)             # 删除第二个节点
 
-0 7 2 3 4
+# 0 7 2 3 4
 
 A.printf()           # 遍历并输出链表各节点数据
 print(A.len())       # 输出链表长度
@@ -255,7 +255,13 @@ print(A)
 
 二叉树是最常见也最常用的树结构，根据其外观可分为：【1】满二叉树（每个叶子节点均位于最深层，且其父节点一定有左，右两个子节点）
 【2】完全二叉树：除最深层外，其余层所构成的二叉树为满二叉树，最深层叶子节点从左往右依次排列，可以不满）。其余如非满二叉树
-，非完全二叉树同理，下面我们来构建一般意义上的二叉树，并对其实现遍历
+，非完全二叉树同理，下面我们来构建一般意义上的二叉树，并对其实现遍历。
+
+二叉树的性质补充：
+1.二叉树第i层上至多有2^(i-1)个节点
+2.深度为K的二叉树至多有2^K -1 个节点
+3.对任一二叉树，若度为2（出边为2）的节点有n个，则叶子节点（度为0）必有n+1个。特别的，满二叉树只有度为2和0的节点，若已知前者为n，则二叉树节点个数为2n+1
+4.对于完全二叉树，若某节点编号为i，则其左孩子（左子树根节点）编号为2i，右孩子编号为2i+1,双亲编号为i/2。
 """
 class BinaryTree:
     def __init__(self,rootnode): 
@@ -346,10 +352,10 @@ post_order_travel(Tree)
 
 """
 遍历结果如下:
-广度优先遍历：4 3 5 2 1 
-先序遍历：4 3 2 1 5 
-中序遍历：2 1 3 4 5 
-后序遍历：2 1 3 5 4 
+广度优先遍历：4 3 5 1 2 
+先序遍历：4 3 1 2 5
+中序遍历：1 3 2 4 5 
+后序遍历：1 2 3 5 4
 """
     
 # (3.2) 图
@@ -362,10 +368,15 @@ post_order_travel(Tree)
 最后，有向图可以组成闭环这一几何结构，进而将图分为有环图和无环图。
 
 对于树这一数据结构，我们的侧重点在于用其来补充列表的不足；而对于图来说，我们将完全聚焦于其强大的图形和路径表达能力上。
-下面我们来构建一般意义上的图，并对其实现遍历
+下面我们来构建一般的等权图，并对其实现遍历。
+
+图的性质补充：
+1.具有n个顶点的无向图最多有n(n-1)/2条边（出度和入度概念一致）
+2.具有n个顶点的有向图最多有n(n-1)条边（出度和入度概念不一致）
 """
 import numpy as np
-class Graph:  # 出于简洁，本例只用邻接矩阵表示法来表示图
+# 图的邻接矩阵表示法
+class Graph_Matrix:  
     def __init__(self,n):
         self.List_vertex=[] # 用于存放顶点
         self.num_vertex=n # 顶点个数
@@ -379,7 +390,7 @@ class Graph:  # 出于简洁，本例只用邻接矩阵表示法来表示图
         if index1==index2:
             print("error!")
         else:
-            self.matrix[index1][index2]=1 # 若其中任一元素为0，则说明两顶点之间存在指向
+            self.matrix[index1][index2]=1 # 存在单向指向关系，则矩阵对称项之一为0
             self.matrix[index2][index1]=1
             return self.matrix
     
@@ -424,10 +435,9 @@ class Graph:  # 出于简洁，本例只用邻接矩阵表示法来表示图
                 if vertex not in Visited:
                     Visited.append(vertex)
                     List.append(vertex)
-    
 
 List=["A","B","C","D","E","F"] 
-graph=Graph(len(List)) # 生成图，此时没有顶点没有边，需载入
+graph=Graph_Matrix(len(List)) # 生成图，此时没有顶点没有边，需载入
 for i in range(len(List)): # 载入顶点
     graph.add_vertex(List[i]) 
 graph.add_edge(1,2) # 载入边
@@ -462,6 +472,78 @@ F:[0 0 1 0 1 0]
 深度优先遍历：F E D C B A
 广度优先遍历：F C E A B D
 """
+
+# 图的邻接表表示法
+class Graph_Dict: 
+    def __init__(self):
+        self.dict={} # 邻接表
+    
+    def add_vertex(self,new_vertex): # 初始化邻接表
+        self.dict[new_vertex]={}
+        return self.dict
+
+    def add_edge(self,vertex1,vertex2): # 载入边（输入两顶点名称）
+        if vertex1==vertex2:
+            print("error!")
+        else:
+            self.dict[vertex1][vertex2]=1 # 若存在单向指向关系，则只添加其中一项
+            self.dict[vertex2][vertex1]=1
+
+    def show_dict(self): # 展示整个邻接表
+        for vertex_start in self.dict:
+            print(vertex_start+":",end=" ")
+            for vertex_end in self.dict[vertex_start]:
+                print(vertex_end,end=" ")
+            print("\n")
+    
+    def neighbor_vertex(self,vertex): # 由某一顶点得到其邻接顶点
+        List=[]
+        for vertex0 in self.dict[vertex]:
+            List.append(vertex0)
+        return List
+
+    def bfs_travel(self,start_vertex): # 广度优先遍历
+        Visited=[start_vertex]
+        List=[start_vertex]
+        while List:
+            cur_vertex=List.pop(0) 
+            print(cur_vertex, end=" ")
+            for vertex in self.neighbor_vertex(cur_vertex):
+                if vertex not in Visited:
+                    Visited.append(vertex)
+                    List.append(vertex)
+
+
+    def dfs_travel(self,start_vertex): # 深度优先遍历
+        Visited=[start_vertex]
+        List=[start_vertex]
+        while List:
+            cur_vertex=List.pop() 
+            print(cur_vertex, end=" ")
+            for vertex in self.neighbor_vertex(cur_vertex):
+                if vertex not in Visited:
+                    Visited.append(vertex)
+                    List.append(vertex)
+
+List=["A","B","C","D","E","F"] 
+graph=Graph_Dict()
+for i in range(len(List)): # 载入顶点
+    graph.add_vertex(List[i])
+graph.add_edge("B","C") # 载入边
+graph.add_edge("C","E")
+graph.add_edge("D","E")
+graph.add_edge("B","A")
+graph.add_edge("C","A")
+graph.add_edge("C","F")
+graph.add_edge("E","F")
+
+graph.show_dict() # 展示邻接矩阵
+
+graph.dfs_travel("F") # 深度优先遍历
+graph.bfs_travel("F") # 广度优先遍历
+    
+
+
     
 
         
