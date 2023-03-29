@@ -361,12 +361,18 @@ metrics.adjusted_rand_score( ) # 随机兰德调整指数
 
 # 5 模型优化（交叉验证技术）
 """
-在sklearn中，模型优化板块用于辅助选择模型，常用的包括两大块，一为交叉验证技术；二为超参数调整。此处我们介绍交叉验证技术的运用，
-超参数调整将于他处专门介绍。
+在sklearn中，模型优化板块用于辅助选择模型，常用的包括两大块，一为交叉验证技术；二为超参数调整。
 
 交叉验证技术的使用有助于降低因随机性所带来的单次测试误差的不确定性，换句话说，交叉验证支持多次随机测试，且一般取多次测试误差的
 均值作为最终评估比对的手段，不过可以预见的是，交叉验证的使用将大大提高计算量。
+
+在交叉验证的基础上，结合网格搜索策略（GridSearchCV）或随机搜索策略（RandomizedSearchCV）可用于辅助我们通过验证集来找出最佳的超参数。
+【1】何为超参数：超参数即模型外的参数，通常与模型训练所用的算法相关，因为超参数预设于建模之前，故无法通过优化损失函数的方式来直接获取最优值
+【2】验证集：验证集的一大作用即在于通过随机搜索策略或网格搜索策略来“人工”获取给定范围下的最优超参数，本质为手动调参
+【3】网格搜索为预先设定可选超参数的集合，然后组合出所有可能的超参数并逐一检索；而随机搜索为设定可选超参数的范围，指定搜索组合数并随机取超参数
+组合，最后进行检索。总体来说，随机搜索效率更高，网格搜索适用于小范围内超参数的检索
 """
+# 交叉测试
 from sklearn import datasets
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import cross_val_score # sklearn监督学习交叉验证技术
@@ -377,3 +383,37 @@ iris_x=iris.data; iris_y=iris.target
 kfold=StratifiedKFold(n_splits=10, random_state=1, shuffle=True) # 10折交叉划分法（用于划分训练集和测试集）
 cv_results=cross_val_score(LogisticRegression(), iris_x, iris_y, cv=kfold, scoring="accuracy") # 交叉测试，模型评价指标为分类准确率
 print(cv_results.mean()) # 10次测试的均值作为预测准确率
+
+
+# 超参数择优
+from sklearn import datasets
+from scipy.stats import randint as sp_randint # 统计分布
+from sklearn.model_selection import RandomizedSearchCV, GridSearchCV # 随机搜索与网格搜索
+from sklearn.ensemble import RandomForestClassifier 
+
+digits=datasets.load_digits() # 载入手写识别数据集
+digits_x=digits.data; digits_y=digits.target
+clf = RandomForestClassifier(n_estimators=20) # 随即森林中决策树数量为20
+
+# RandomizedSearchCV
+# 给定超参数max_depth、max_features等的搜索范围
+param_dist1 = {"max_depth": [3, None],                    # 给定列表
+              "max_features": sp_randint(1, 11),          # 给定均匀离散分布（1到10随机取整数）
+              "min_samples_split": sp_randint(2, 11),     # 给定均匀离散分布（2到10随机取整数）
+              "bootstrap": [True, False],                 # 给定列表
+              "criterion": ["gini", "entropy"]}           # 给定列表（基尼系数或熵）
+
+random_search = RandomizedSearchCV(clf, param_distributions=param_dist1, n_iter=20, cv=5) # n_iter表示随机搜索20组，cv表示5折交叉验证
+random_search.fit(digits_x, digits_y)
+print('最优分类器:',random_search.best_params_,'最优分数:', random_search.best_score_)
+
+# GridSearchCV
+param_dist2 = {"max_depth": [3, None],                    
+              "max_features": [1,3,5,7,9],          
+              "min_samples_split": [2,4,6,8,10],     
+              "bootstrap": [True, False],                 
+              "criterion": ["gini", "entropy"]}
+
+grid_search = GridSearchCV(clf, param_grid=param_dist2, cv=5)
+grid_search.fit(digits_x, digits_y)
+print('最优分类器:',grid_search.best_params_,'最优分数:', grid_search.best_score_)

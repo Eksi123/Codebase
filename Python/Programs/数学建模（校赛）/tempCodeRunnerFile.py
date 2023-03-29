@@ -1,40 +1,43 @@
-import scipy.integrate as spi
-from scipy.signal import savgol_filter
+# 混合高斯模型（以一维两高斯混合模型为例）
 import numpy as np
-import pylab as pl
-import math
- 
-# 模拟SIR模型求解常数c1
-beta=1.46 # 每周平均接触率
-gamma=1.3 # 每周平均移出率
-TS=1.0 # 时间间隔
-ND=9 # 终止时间
-S0=0.999 # 初始s0
-I0=0.001 # 初始i0
-INPUT = (S0, I0, 0.0)
- 
-def diff_eqs(INP,t): # 微分方程
-	'''The main set of equations'''
-	Y=np.zeros((3))
-	V = INP
-	Y[0] = - beta * V[0] * V[1]
-	Y[1] = beta * V[0] * V[1] - gamma * V[1]
-	Y[2] = gamma * V[1]
-	return Y   # For odeint
- 
-t_start = 0.0; t_end = ND; t_inc = TS
-t_range = np.arange(t_start, t_end+t_inc, t_inc) # 时间序列
-RES = spi.odeint(diff_eqs,INPUT,t_range) # 求解微分方程，返回三种群体的比例
 
-Infected=1000*np.array(RES[:,1]+RES[:,2]) # 模拟感染+移出数
-Infected=savgol_filter(Infected,9,3,mode="nearest") # 数据平滑
-real_Infected=np.array([1,3,4,7,10,17,21,24,25]) # 真实感染+移出数
-real_Infected=savgol_filter(real_Infected,9,3,mode="nearest") # 数据平滑
+def Gaussian(x, mu, sigma): # 计算高斯分布密度
+    GaussianP = (1/(sigma * np.sqrt(2 * np.pi)))*(np.exp(-1 * np.square(x - mu)/(2 * np.square(sigma))))
+    return GaussianP
 
-pl.plot(Infected, label='Infectious',color="red")
-pl.plot(real_Infected, label='real_Infectious',color="blue")
-pl.title('SIR_Model')
-pl.xlabel('Time')
-pl.ylabel('Infectious')
-pl.legend()
-pl.show()
+def EM_Algorithm(Data,theta,times): # EM算法
+    """
+    输入样本数据Data和迭代参数theta=[pi,mu1,sigma1,mu2,sigma2]
+    """
+    def E_step(x,theta): # E步，计算pi的期望值（进而可知Q函数）
+        exp_pi = theta[0]*Gaussian(x,theta[1],theta[2])+(1-theta[0])*Gaussian(x,theta[3],theta[4])
+        exp_pi1 = (theta[0]*Gaussian(x,theta[1],theta[2]))/exp_pi
+        exp_pi2 = (1-theta[0])*Gaussian(x,theta[3],theta[4])/exp_pi
+        return(exp_pi1, exp_pi2)
+    
+    def M_step(Data,theta): # M步，根据优化计算结果更新参数
+        theta_new = []
+        length = len(Data)
+        sum_exp_pi1,sum_exp_pi2 = 0,0; sum11,sum12 = 0,0; sum21,sum22 = 0,0
+        for i in range(length):
+            sum_exp_pi1 =  sum_exp_pi1+E_step(Data[i],theta)[0]
+            sum_exp_pi2 =  sum_exp_pi2+E_step(Data[i],theta)[1]
+            sum11 = sum11+E_step(Data[i],theta)[0]*Data[i]
+            sum21 = sum21+E_step(Data[i],theta)[1]*Data[i]
+            sum12 = sum12+E_step(Data[i],theta)[0]*(Data[i]-theta[1])*(Data[i]-theta[1])
+            sum22 = sum12+E_step(Data[i],theta)[1]*(Data[i]-theta[3])*(Data[i]-theta[3])
+        theta_new.append(sum_exp_pi1/length)
+        theta_new.append(sum11/sum_exp_pi1)
+        theta_new.append(np.sqrt(sum12/sum_exp_pi1))
+        theta_new.append(sum21/sum_exp_pi2)
+        theta_new.append(np.sqrt(sum12/sum_exp_pi2))
+        return theta_new
+    
+    for j in range(times): # 迭代计算，直至达到预定次数
+        theta = M_step(Data,theta)
+    return theta
+
+Data = np.array([-67,-48,6,8,14,16,23,24,28,29,41,49,56,60,75]) # 输入数据
+Theta = np.array([0.4,0,100,0,200])
+theta_new = EM_Algorithm(Data,Theta,100)
+print(theta_new)

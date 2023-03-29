@@ -13,7 +13,7 @@ from sklearn.cluster import DBSCAN
 from sklearn.metrics import silhouette_score # 聚类轮廓系数
 
 # 1 导入数据
-iris_df=pd.DataFrame(pd.read_csv("data/iris.csv", header=0, encoding="utf-8"))  # 导入鸢尾花数据集
+iris_df=pd.read_csv("data/iris.csv", header=0, encoding="utf-8") # 导入鸢尾花数据集
 print(iris_df["variety"].value_counts())
 
 

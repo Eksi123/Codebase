@@ -483,73 +483,77 @@ path= ['A', 'B', 'E', 'F', 'G']
 
 # 2.图的最小生成树问题
 """
-最小生成树问题旨在找到这样一副子图：包含原图所有节点，且各节点之间都是相互“可达”的，同时要求相连边的总权值（距离）“最小”。不难得知最小生成树（图）总边数 = 总节点数-1
+最小生成树问题旨在找到这样一副子图：包含原图所有节点，且各节点之间都是相互“可达”的，同时要求相连边的总权值（距离）“最小”。简而言之，就是以最小代价构建起顶点全连通的子图。
+
+不难得知最小生成树总边数 = 总节点数-1
+"""
+import numpy as np
+class Graph: # 非等权图的邻接表表示法
+    def __init__(self):
+        self.dict={} # 邻接表
+    
+    def add_vertex(self,new_vertex): # 初始化邻接表
+        self.dict[new_vertex]={}
+        return self.dict
+
+    def add_edge(self,vertex1,vertex2,weight): # 载入边（输入两顶点名称）
+        if vertex1==vertex2:
+            print("error!")
+        else:
+            self.dict[vertex1][vertex2]=weight # 若存在单向指向关系，则只添加其中一项
+            self.dict[vertex2][vertex1]=weight
+
+    def show_dict(self): # 展示整个邻接表
+        for vertex_start in self.dict:
+            print(vertex_start+":",end=" ")
+            for vertex_end in self.dict[vertex_start]:
+                print(vertex_end,end=" ")
+            print("\n")
+
+List=["A","B","C","D","E","F","G"] 
+graph=Graph() 
+for i in range(len(List)): # 载入顶点
+    graph.add_vertex(List[i]) 
+graph.add_edge("A","B",3) # 载入边
+graph.add_edge("A","C",1)
+graph.add_edge("B","C",2)
+graph.add_edge("B","D",4)
+graph.add_edge("B","E",2)
+graph.add_edge("C","E",5)
+graph.add_edge("D","F",3)
+graph.add_edge("E","F",2)
+graph.add_edge("E","G",5)
+graph.add_edge("F","G",2)
+
+"""
+图的结构如下：
+           
+           B --- D -- F
+         / | \      / |
+        A  |  \    /  |
+         \ |   \  /   |
+           C --- E -- G
+权重：
+A<->B(3) A<->C(1) 
+B<->C(2) B<->D(4) B<->E(2)
+C<->E(5)
+D<->F(3)
+E<->F(2) E<->G(5)
+F<->G(2)
 """
 
-#Kruskal算法：归并顶点的贪婪算法，适合稠密图
-def Kruskal(graph):
-    vnum=graph.vertex_num()
-    reps=[i for i in range(vnum)]
-    mst,edges=[],[]
-    for vi in range(vnum):
-        for v,w in graph.out_edges(vi):
-            edges.append((w,vi,v))
-    edges.sort()
-    for w,vi,vj in edges:
-        if reps[vi]!=reps[vj]:
-            mst.append(((vi,vj),w))
-            if len(mst)==vnum-1:
-                break
-            rep,orep=reps[vi],reps[vj]
-            for i in range(vnum):
-                if reps[i]==orep:
-                    reps[i]=rep
-    return mst
+# Kruskal算法：归并边的贪婪算法，适合稀疏图
 
-#prim算法：归并边的贪婪算法，适合稀疏网
-def Prim(graph):
-    vnum=graph.vertex_num()
-    mst=[None]*vnum
-    cands=PrioQue([(0,0,0)])
-    count=0
-    while count<vnum and not cands.is_empty():
-        w,u,v=cands.dequeue()
-        if mst[v]:
-            continue
-        mst[v]=((u,v),w)
-        count+=1
-        for vi,w in graph.out_edges(v):
-            if not mst[vi]:
-                cands.enqueue((w,v,vi))
-    return mst
+
+
+
+# Prim算法：归并顶点的贪婪算法，适合稠密网
+
 
 
 # 3.图的拓扑排序问题
 """
 简单理解就是将一个有向无环图（有向指单向）排成一个序列，序列顺序满足图的指向关系，这就要求序列中某节点的前驱节点排在它前面，后继节点位于它后面，同一层节点相邻排列。
+
+此处不作详细介绍
 """
-def topological_sort(self):
-        print('topological sort----------------')
-        in_degree_map={}#入度map
-        queue=Queue()
-        result=[]
-        for vertex in self.vertices.values():#构造入度矩阵
-            if len(vertex.inEdges)==0:
-                queue.put(vertex)#入队
-            else:
-                in_degree_map[vertex]=len(vertex.inEdges)
-
-        while not queue.empty():
-            vertex=queue.get()
-            result.append(vertex.value)
-            for edge in vertex.outEdges:
-                in_degree =in_degree_map.get(edge.to)-1
-                in_degree_map[edge.to]=in_degree
-                if in_degree==0:
-                    queue.put(edge.to)
-
-        if len(result)<len(self.vertices):
-            print('图有环，无法进行拓扑排序')
-        else:
-            print('图无环，拓扑排序结果为：')
-            print(result)
